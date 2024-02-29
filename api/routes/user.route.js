@@ -1,6 +1,9 @@
 import express from 'express';
 import { test } from '../controllers/user.controller.js';
-const router = express.Router();
-router.get('/test', test);
 
-export  {router as UserRouter};
+const userRouter = express.Router(); // Renamed the router variable
+userRouter.get('/test', test);
+
+export { userRouter };
+// user.route.js
+

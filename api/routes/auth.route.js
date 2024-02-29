@@ -1,5 +1,7 @@
 import express from 'express';
 import { signup } from '../controllers/auth.controller.js';
-const router = express.Router();
-router.post("/signup",signup);
-export {router as authrouter};
+
+const authRouter = express.Router(); // Rename the router variable
+authRouter.post("/signup", signup);
+
+export { authRouter };
