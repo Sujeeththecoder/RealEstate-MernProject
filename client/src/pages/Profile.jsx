@@ -9,7 +9,7 @@ export default function Profile() {
     const[file, setFile] = useState(undefined);
     const [filePerc, setFilePerc] = useState(0);
     const[fileUploadError, setFileUploadError] = useState(false);
-    cconst[FormData, setFormData] = useState({});
+    const[FormData, setFormData] = useState({});
     console.log(FormData);
     console.log(filePerc);
     console.log(fileUploadError);
