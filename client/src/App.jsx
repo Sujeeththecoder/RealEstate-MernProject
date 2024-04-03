@@ -1,7 +1,4 @@
 
-// import {BrowserRouter} from 'react-router-dom';
-
-
 import {BrowserRouter, Route,Routes} from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
