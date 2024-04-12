@@ -1,71 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function LocateMe() {
-  const [city, setCity] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+const LocateMe = () => {
+  const [city, setCity] = useState('');
 
-  const handleLocateMe = () => {
-    setIsLoading(true);
-    setError(null);
-
-    getCoordinates();
-  };
-
-  function getCoordinates() {
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
+  useEffect(() => {
+    const getLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          successCallback,
+          errorCallback
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
     };
 
-    function success(pos) {
-      const crd = pos.coords;
-      getCity([crd.latitude, crd.longitude]);
-    }
+    const successCallback = (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      getCity([lat, lng]);
+    };
 
-    function error(err) {
-      setError(`Error getting location: ${err.message}`);
-      setIsLoading(false); 
-    }
+    const errorCallback = (error) => {
+      console.error("Error getting user location:", error);
+      alert("Permission to access location was denied.");
+    };
 
-    navigator.geolocation.getCurrentPosition(success, error, options);
-  }
+    const getCity = (coordinates) => {
+      const [lat, lng] = coordinates;
+      const token = "pk.2a08df6900bc9ab64ca80083b3433d78"; // Replace with your LocationIQ token
+      const url = `https://us1.locationiq.com/v1/reverse.php?key=${token}&lat=${lat}&lon=${lng}&format=json`;
 
-  function getCity(coordinates) {
-    const xhr = new XMLHttpRequest(); 
-    const lat = coordinates[0]; 
-    const lng = coordinates[1]; 
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          const city = data.address.city;
+          setCity(city);
+        })
+        .catch((error) => {
+          console.error("Error fetching city:", error);
+        });
+    };
 
-    // Replace with your actual LocationIQ access token
-    const url = `https://us1.locationiq.com/v1/reverse.php?key=pk.2a08df6900bc9ab64ca80083b3433d78&lat=${lat}&lon=${lng}&format=json`;
-
-    xhr.open('GET', url, true);
-    xhr.send();
-    xhr.onreadystatechange = processRequest; 
-
-    function processRequest(e) { 
-      if (xhr.readyState == 4) {
-        setIsLoading(false);
-        if (xhr.status == 200) { 
-          const response = JSON.parse(xhr.responseText); 
-          setCity(response.address.city); 
-        } else {
-          setError('Error getting city data');
-        }
-      }
-    } 
-  }
+    getLocation();
+  }, []);
 
   return (
-    <>
-      <button onClick={handleLocateMe} disabled={isLoading}>
-        {isLoading ? 'Locating...' : 'Locate Me'}
-      </button>
-      {city && <p>Your city: {city}</p>}
-      {error && <p className="error-message">{error}</p> } 
-    </>
+    <div>
+      <h2>Your Current City: {city}</h2>
+    </div>
   );
-}
+};
 
 export default LocateMe;
