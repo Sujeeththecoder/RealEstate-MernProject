@@ -15,11 +15,6 @@ const app = express();
 app.use(express.json());
 
 
-// app.use((req, res, next) => {
-//     console.log('Incoming JSON data:', req.body);
-//     next();
-// });
-
 app.use(cookieParser());
 
 app.listen(3000, () => {
