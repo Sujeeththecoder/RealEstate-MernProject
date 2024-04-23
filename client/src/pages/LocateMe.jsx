@@ -19,6 +19,7 @@ const LocateMe = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       getCity([lat, lng]);
+      saveLocationToDatabase(lat, lng); 
     };
 
     const errorCallback = (error) => {
@@ -28,7 +29,7 @@ const LocateMe = () => {
 
     const getCity = (coordinates) => {
       const [lat, lng] = coordinates;
-      const token = "pk.2a08df6900bc9ab64ca80083b3433d78"; // Replace with your LocationIQ token
+      const token = "pk.2a08df6900bc9ab64ca80083b3433d78"; 
       const url = `https://us1.locationiq.com/v1/reverse.php?key=${token}&lat=${lat}&lon=${lng}&format=json`;
 
       fetch(url)
@@ -42,8 +43,24 @@ const LocateMe = () => {
         });
     };
 
+    const saveLocationToDatabase = (lat, lng) => {
+      fetch('/api/location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          city: city,
+          coordinates: [lat, lng]
+        })
+      })
+      .then(response => response.json())
+      .then(data => console.log('Location saved to database:', data))
+      .catch(error => console.error('Error saving location to database:', error));
+    };
+
     getLocation();
-  }, []);
+  }, [city]);
 
   return (
     <div>
