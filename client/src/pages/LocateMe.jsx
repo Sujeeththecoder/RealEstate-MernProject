@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const LocateMe = () => {
   const [city, setCity] = useState('');
+  const [locationSaved, setLocationSaved] = useState(false);
 
   useEffect(() => {
     const getLocation = () => {
@@ -19,7 +20,7 @@ const LocateMe = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       getCity([lat, lng]);
-      saveLocationToDatabase(lat, lng); 
+      checkLocationSaved(); 
     };
 
     const errorCallback = (error) => {
@@ -29,7 +30,7 @@ const LocateMe = () => {
 
     const getCity = (coordinates) => {
       const [lat, lng] = coordinates;
-      const token = "pk.2a08df6900bc9ab64ca80083b3433d78"; 
+      const token = "pk.2a08df6900bc9ab64ca80083b3433d78";
       const url = `https://us1.locationiq.com/v1/reverse.php?key=${token}&lat=${lat}&lon=${lng}&format=json`;
 
       fetch(url)
@@ -43,28 +44,25 @@ const LocateMe = () => {
         });
     };
 
-    const saveLocationToDatabase = (lat, lng) => {
-      fetch('/api/location', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          city: city,
-          coordinates: [lat, lng]
+    const checkLocationSaved = () => {
+      fetch('/api/location/check')
+        .then((response) => response.json())
+        .then((data) => {
+          setLocationSaved(data.locationExists);
         })
-      })
-      .then(response => response.json())
-      .then(data => console.log('Location saved to database:', data))
-      .catch(error => console.error('Error saving location to database:', error));
+        .catch((error) => {
+          console.error("Error checking location:", error);
+        });
     };
 
     getLocation();
-  }, [city]);
+  }, []);
 
   return (
     <div>
       <h2>Your Current City: {city}</h2>
+      {locationSaved && <p>Location is saved in the database!</p>}
+      {!locationSaved && <p>Location is not saved in the database.</p>}
     </div>
   );
 };
